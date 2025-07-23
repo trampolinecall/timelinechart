@@ -34,7 +34,7 @@ def main(input_file: str):
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
     ax.axvline(datetime.datetime.today(), color='red')
     ax.set_xlabel('time')
-    ax.set_title('pieces')
+    ax.set_title('things')
 
     plt.show()
 

@@ -1,0 +1,47 @@
+import datetime
+from matplotlib import pyplot as plt
+import matplotlib.dates as mdates
+import argparse
+import re
+
+DATA_PATTERN = re.compile(r'^(\d\d\d\d-\d\d-\d\d|::::::::::) (\d\d\d\d-\d\d-\d\d) (.*)$', re.M)
+
+def main(input_file: str):
+    with open(input_file, 'r') as f:
+        contents = f.read()
+
+    entries = []
+
+    for match in DATA_PATTERN.finditer(contents):
+        label = match.group(3)
+        if match.group(1) == '::::::::::':
+            end = datetime.datetime.today()
+        else:
+            end = datetime.datetime.strptime(match.group(1), '%Y-%m-%d')
+        start = datetime.datetime.strptime(match.group(2), '%Y-%m-%d')
+        length = end - start
+
+        entries.append((label, start, length))
+
+    entries.sort(key=lambda entry: entry[1]) # sort by start date
+
+    # unzip into a list of all the labels, all the starts dates, and all the lengths
+    (names, starts, lengths) = map(list, zip(*entries))
+
+    fig, ax = plt.subplots()
+
+    ax.barh(names, lengths, left=starts)
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    ax.axvline(datetime.datetime.today(), color='red')
+    ax.set_xlabel('time')
+    ax.set_title('pieces')
+
+    plt.show()
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input')
+
+    args = parser.parse_args()
+
+    main(args.input)
